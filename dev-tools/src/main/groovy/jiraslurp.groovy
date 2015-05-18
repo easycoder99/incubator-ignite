@@ -161,7 +161,7 @@ def runAllTestBuilds = { jiraNum ->
 
   String line;
   while ( (line = br.readLine()) != null)
-    System.out.println(line);
+    println line
 
   br.close();
 }
@@ -172,10 +172,6 @@ args.each {
   def parameters = it.split('=')
 
   if (parameters[0] == 'slurp') {
-    String psSt = "curl -v POST http://task_runner:amq+KF4Trn+J@204.14.53.152:80/httpAuth/app/rest/buildQueue -H \"Content-Type: application/xml\" -d \"<build><buildType id='Ignite_IgniteBasic'/></build>\""
-
-    checkprocess Runtime.getRuntime().exec(psSt);
-
     checkForAttachments()
 
     // For each ticket with new attachment, let's trigger remove build
