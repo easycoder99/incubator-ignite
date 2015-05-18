@@ -137,7 +137,7 @@ def runAllTestBuilds = { jiraNum ->
 
   String postData = "<build><buildType id='Ignite_IgniteBasic'/></build>";
 
-  URL url = new URL("http://204.14.53.152:80/httpAuth/app/rest/buildQueue");
+  URL url = new URL("http://10.30.0.229:80/httpAuth/app/rest/buildQueue");
   HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
   String encoded = new sun.misc.BASE64Encoder().encode("$user:$pwd".getBytes());
