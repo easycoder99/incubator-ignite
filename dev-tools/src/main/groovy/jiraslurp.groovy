@@ -132,38 +132,51 @@ def JIRA_xml = { jiranum ->
 def run
 
 def runAllTestBuilds = { jiraNum ->
+  def tcURL = System.getenv('TC_URL')
   def user = System.getenv('TASK_RUNNER_USER')
   def pwd = System.getenv('TASK_RUNNER_PWD')
 
-  String postData = "<build><buildType id='Ignite_IgniteBasic'/></build>";
+  ["Ignite_IgniteBasic",
+   "Ignite_IgniteCache"].each {
+    String postData =
+        "<build>" +
+        "  <buildType id='$it'/>" +
+        "  <properties>" +
+        "    <property name='JIRA_NUM' value='$jiraNum'/>" +
+        "  </properties>" +
+        "</build>";
 
-  URL url = new URL("http://10.30.0.229:80/httpAuth/app/rest/buildQueue");
-  HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    URL url = new URL("http://$tcURL:80/httpAuth/app/rest/buildQueue");
+      
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-  String encoded = new sun.misc.BASE64Encoder().encode("$user:$pwd".getBytes());
+    String encoded = new sun.misc.BASE64Encoder().encode("$user:$pwd".getBytes());
 
-  conn.setRequestProperty("Authorization", "Basic "+encoded);
+    conn.setRequestProperty("Authorization", "Basic "+encoded);
 
-  conn.setDoOutput(true);
-  conn.setRequestMethod("POST");
-  conn.setRequestProperty("Content-Type", "application/xml");
-  conn.setRequestProperty("Content-Length", String.valueOf(postData.length()));
+    conn.setDoOutput(true);
+    conn.setRequestMethod("POST");
+    conn.setRequestProperty("Content-Type", "application/xml");
+    conn.setRequestProperty("Content-Length", String.valueOf(postData.length()));
 
-  OutputStream os = conn.getOutputStream();
-  os.write(postData.getBytes());
-  os.flush();
-  os.close();
+    OutputStream os = conn.getOutputStream();
+    os.write(postData.getBytes());
+    os.flush();
+    os.close();
 
-  conn.connect();
+    conn.connect();
 
-  // Read response.
-  BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    // Read response.
+    println "Response: "  
+      
+    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
-  String line;
-  while ( (line = br.readLine()) != null)
-    println line
+    String line;
+    while ( (line = br.readLine()) != null)
+      println line
 
-  br.close();
+    br.close();
+  }
 }
 
 args.each {
