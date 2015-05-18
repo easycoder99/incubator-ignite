@@ -232,11 +232,13 @@ args.each {
 
         String row = getLatestAttachment(rss.channel.item)
 
+        println "Got row: $row."
+
         if (row != null) {
             def pair = row.split(',')
             def jira = pair[0]
             def attachementURL = pair[1]
-            
+
             applyPatch(jira, attachementURL)
         }
     }
