@@ -133,7 +133,14 @@ def applyPatch = { jira, attachementURL ->
 
     patchFile << new URL("$ATTACHMENT_URL/$attachementURL/").text
 
-    checkprocess "git am ../${patchFile.name}".execute(null, new File('incubator-ignite'))
+    try {
+        checkprocess "git am ../${patchFile.name}".execute(null, new File('incubator-ignite'))
+    }
+    catch (Exception e) {
+        checkprocess "git am --abort".execute
+
+        throw e;
+    }
 
     assert patchFile.delete(), 'Could not delete patch file.'
 }
