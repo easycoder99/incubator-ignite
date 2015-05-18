@@ -125,11 +125,22 @@ def create_gitbranch = { jira, attachementURL ->
     patchFile.delete()
 }
 
+def applyPatch = { jira, attachementURL ->
+    println jira
+    println "$ATTACHMENT_URL/$attachementURL/"
+
+    def patchFile = new File("${jira}-${attachementURL}.patch")
+
+    patchFile << new URL("$ATTACHMENT_URL/$attachementURL/").text
+
+    checkprocess "git am ../${patchFile.name}".execute(null, new File('incubator-ignite'))
+
+    assert patchFile.delete(), 'Could not delete patch file.'
+}
+
 def JIRA_xml = { jiranum ->
     "https://issues.apache.org/jira/si/jira.issueviews:issue-xml/$jiranum/${jiranum}.xml"
 }
-
-def run
 
 def runAllTestBuilds = { jiraNum ->
     assert jiraNum != 'null', 'Jira number should not be null.'
@@ -223,8 +234,10 @@ args.each {
 
         if (row != null) {
             def pair = row.split(',')
-
-            create_gitbranch(pair[0], pair[1])
+            def jira = pair[0]
+            def attachementURL = pair[1]
+            
+            applyPatch(jira, attachementURL)
         }
     }
     else if (parameters.length == 2 && parameters[0] == "runAllBuilds" && parameters[1] ==~ /\w+-\d+/) {
